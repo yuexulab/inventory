@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building Block Library — Structure Viewer</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF1EA;
+    --raised:#F8FAF5;
+    --ink:#1C2620;
+    --soft:#4B5850;
+    --line:#C9D0C2;
+    --amber:#B4661F;
+    --teal:#3F6E63;
+    --teal-soft:#DEE9E4;
+  }
+  *{box-sizing:border-box;}
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Source Serif 4', Georgia, serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* --- structure svg palette (factored out of every path) --- */
+  svg.struct{ display:block; width:100%; height:100%; }
+  .struct .k,.struct .km,.struct .r,.struct .b,.struct .y,.struct .n,.struct .c,.struct .g,.struct .kt{
+    fill:none; stroke-linecap:butt; stroke-linejoin:miter; stroke-width:1.5px;
+  }
+  .struct .k,.struct .kt{ stroke:#1C2620; }
+  .struct .km{ stroke:#1C2620; stroke-miterlimit:10; }
+  .struct .kt{ stroke-width:0.8px; }
+  .struct .r{ stroke:#B3402B; }
+  .struct .b{ stroke:#2F5AA8; }
+  .struct .y{ stroke:#A38A0E; }
+  .struct .n{ stroke:#7F4C19; }
+  .struct .c{ stroke:#2E9296; }
+  .struct .g{ stroke:#2E8B3D; }
+  .struct path[fill]{ stroke:none; }
+
+  header{
+    padding:38px 32px 24px; border-bottom:1px solid var(--line);
+    display:flex; justify-content:space-between; align-items:flex-end;
+    gap:24px; flex-wrap:wrap;
+  }
+  header h1{ margin:0; font-size:29px; font-weight:600; letter-spacing:-0.012em; }
+  header p{ margin:7px 0 0; color:var(--soft); font-size:14.5px; max-width:54ch; line-height:1.5; }
+  .tally{ font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--soft); text-align:right; }
+  .tally strong{ display:block; font-size:30px; color:var(--ink); font-weight:600; line-height:1.1; }
+
+  .toolbar{
+    position:sticky; top:0; z-index:5; background:var(--paper);
+    padding:15px 32px; border-bottom:1px solid var(--line);
+    display:flex; gap:12px; align-items:center; flex-wrap:wrap;
+  }
+  #search{
+    flex:1; min-width:230px; padding:10px 13px;
+    border:1px solid var(--line); background:var(--raised); border-radius:3px;
+    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink); outline:none;
+  }
+  #search:focus{ border-color:var(--teal); }
+  #search::placeholder{ color:#8E978E; }
+  .tabs{ display:flex; gap:6px; flex-wrap:wrap; }
+  .tab{
+    padding:8px 13px; border:1px solid var(--line); border-radius:3px;
+    background:var(--raised); font-family:'IBM Plex Mono',monospace;
+    font-size:12px; cursor:pointer; color:var(--soft); white-space:nowrap;
+  }
+  .tab:hover{ border-color:var(--teal); color:var(--ink); }
+  .tab.on{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+
+  main{ padding:26px 32px 64px; }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(238px,1fr)); gap:16px; }
+
+  .card{
+    background:var(--raised); border:1px solid var(--line); border-radius:4px;
+    padding:13px 13px 11px; cursor:pointer; display:flex; flex-direction:column;
+    transition:border-color .12s ease;
+  }
+  .card:hover{ border-color:var(--teal); }
+  .card:focus-visible{ outline:2px solid var(--teal); outline-offset:2px; }
+  .card .slot{ height:132px; margin:2px 0 9px; }
+  .pos{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px;
+    color:var(--amber); font-weight:600; letter-spacing:.04em;
+  }
+  .card .name{ font-size:13.5px; line-height:1.34; font-weight:600; margin-bottom:7px; }
+  .card .meta{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--soft);
+    display:flex; justify-content:space-between; gap:8px;
+    border-top:1px solid var(--line); padding-top:8px; margin-top:auto;
+  }
+  .card .meta span:last-child{ text-align:right; }
+  .flag{ color:var(--amber); }
+
+  .empty{
+    padding:80px 20px; text-align:center; color:var(--soft);
+    font-family:'IBM Plex Mono',monospace; font-size:13.5px;
+  }
+
+  .overlay{
+    position:fixed; inset:0; background:rgba(20,26,22,.55);
+    display:none; align-items:center; justify-content:center; z-index:50; padding:24px;
+  }
+  .overlay.on{ display:flex; }
+  .modal{
+    background:var(--raised); border:1px solid var(--line); border-radius:6px;
+    max-width:560px; width:100%; max-height:88vh; overflow-y:auto;
+  }
+  .mhead{ display:flex; justify-content:space-between; align-items:flex-start; padding:19px 22px 0; }
+  .mclose{ background:none; border:none; font-size:22px; color:var(--soft); cursor:pointer; line-height:1; padding:0 4px; }
+  .mclose:hover{ color:var(--ink); }
+  .modal h2{ margin:6px 22px 3px; font-size:20px; font-weight:600; line-height:1.28; }
+  .modal .cas{ margin:0 22px 14px; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--soft); }
+  .mstruct{ height:240px; background:#fff; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:8px; }
+  .details{ padding:16px 22px 22px; display:grid; grid-template-columns:1fr 1fr; gap:13px 20px; }
+  .details label{
+    display:block; font-family:'IBM Plex Mono',monospace; font-size:10px;
+    letter-spacing:.06em; color:var(--soft); margin-bottom:3px; text-transform:uppercase;
+  }
+  .details span{ font-family:'IBM Plex Mono',monospace; font-size:12.5px; }
+  .wide{ grid-column:1/-1; }
+  .wide span{ display:block; word-break:break-all; background:var(--teal-soft); padding:8px 10px; border-radius:3px; font-size:11.5px; line-height:1.5; }
+  .note{ grid-column:1/-1; font-size:12px; color:var(--amber); font-family:'Source Serif 4',serif; }
+
+  @media (max-width:640px){
+    header,.toolbar,main{ padding-left:18px; padding-right:18px; }
+    .details{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Building Block Library</h1>
+    <p>Reagent stock for ionizable-lipid synthesis, boxed by scale. Structures rendered from SMILES with RDKit. Select a card for the full record.</p>
+  </div>
+  <div class="tally">showing<strong id="tally">0</strong>of 101</div>
+</header>
+
+<div class="toolbar">
+  <input type="text" id="search" placeholder="search name, CAS, catalog #, vendor, position..." autocomplete="off">
+  <div class="tabs" id="tabs"></div>
+</div>
+
+<main>
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" hidden>nothing matches that search</div>
+</main>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal" role="dialog" aria-modal="true"></div>
+</div>
+
+<script>
+const DATA = {DATA_PLACEHOLDER};
+
+const boxes = ['All', ...[...new Set(DATA.map(d=>d.box))].sort()];
+let activeBox='All', query='';
+
+const tabsEl=document.getElementById('tabs');
+const gridEl=document.getElementById('grid');
+const emptyEl=document.getElementById('empty');
+const tallyEl=document.getElementById('tally');
+const overlay=document.getElementById('overlay');
+const modal=document.getElementById('modal');
+
+boxes.forEach(b=>{
+  const t=document.createElement('button');
+  t.className='tab'+(b==='All'?' on':'');
+  t.textContent = b==='All' ? 'All' : b.replace('Box ','');
+  t.dataset.box=b;
+  t.onclick=()=>{ activeBox=b; [...tabsEl.children].forEach(x=>x.classList.toggle('on',x.dataset.box===b)); render(); };
+  tabsEl.appendChild(t);
+});
+
+document.getElementById('search').addEventListener('input',e=>{
+  query=e.target.value.trim().toLowerCase(); render();
+});
+
+function hit(d){
+  if(activeBox!=='All' && d.box!==activeBox) return false;
+  if(!query) return true;
+  return [d.name,d.cas,d.cat,d.vendor,d.position].join(' ').toLowerCase().includes(query);
+}
+
+function svgEl(markup){
+  const wrap=document.createElement('div');
+  wrap.innerHTML=markup;
+  const s=wrap.firstElementChild;
+  s.classList.add('struct');
+  s.setAttribute('preserveAspectRatio','xMidYMid meet');
+  return s;
+}
+
+function render(){
+  const rows=DATA.filter(hit);
+  tallyEl.textContent=rows.length;
+  emptyEl.hidden=rows.length>0;
+  gridEl.replaceChildren();
+
+  rows.forEach(d=>{
+    const card=document.createElement('div');
+    card.className='card';
+    card.tabIndex=0;
+    card.onclick=()=>open(d);
+    card.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(d); } };
+
+    const pos=document.createElement('div');
+    pos.className='pos';
+    pos.textContent=d.position;
+    card.appendChild(pos);
+
+    const slot=document.createElement('div');
+    slot.className='slot';
+    slot.appendChild(svgEl(d.svg));
+    card.appendChild(slot);
+
+    const nm=document.createElement('div');
+    nm.className='name';
+    nm.textContent=d.name;
+    card.appendChild(nm);
+
+    const meta=document.createElement('div');
+    meta.className='meta';
+    const q=document.createElement('span'); q.textContent=d.qty+' g';
+    const v=document.createElement('span'); v.textContent=d.vendor;
+    meta.append(q,v);
+    card.appendChild(meta);
+
+    gridEl.appendChild(card);
+  });
+}
+
+function open(d){
+  modal.replaceChildren();
+
+  const head=document.createElement('div');
+  head.className='mhead';
+  const p=document.createElement('span');
+  p.className='pos';
+  p.textContent=d.position+' · '+d.box;
+  const x=document.createElement('button');
+  x.className='mclose'; x.textContent='×'; x.setAttribute('aria-label','Close');
+  x.onclick=close;
+  head.append(p,x);
+  modal.appendChild(head);
+
+  const h=document.createElement('h2'); h.textContent=d.name; modal.appendChild(h);
+  const c=document.createElement('div'); c.className='cas'; c.textContent='CAS '+(d.cas||'not recorded'); modal.appendChild(c);
+
+  const box=document.createElement('div');
+  box.className='mstruct';
+  box.appendChild(svgEl(d.svg));
+  modal.appendChild(box);
+
+  const det=document.createElement('div');
+  det.className='details';
+  [['Quantity',d.qty+' g'],['Vendor',d.vendor],['Catalog',d.cat],['Box',d.box]].forEach(([k,v])=>{
+    const cell=document.createElement('div');
+    const l=document.createElement('label'); l.textContent=k;
+    const s=document.createElement('span'); s.textContent=v;
+    cell.append(l,s); det.appendChild(cell);
+  });
+  const sm=document.createElement('div');
+  sm.className='wide';
+  const sl=document.createElement('label'); sl.textContent='SMILES';
+  const ss=document.createElement('span'); ss.textContent=d.smiles;
+  sm.append(sl,ss); det.appendChild(sm);
+
+  if(d.filled){
+    const n=document.createElement('div');
+    n.className='note';
+    n.textContent='SMILES was blank in the source spreadsheet and was filled in from the CAS number — worth confirming before use.';
+    det.appendChild(n);
+  }
+  modal.appendChild(det);
+
+  overlay.classList.add('on');
+  x.focus();
+}
+
+function close(){ overlay.classList.remove('on'); }
+overlay.onclick=e=>{ if(e.target===overlay) close(); };
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') close(); });
+
+render();
+
+function reportHeight(){
+  const h = document.documentElement.scrollHeight;
+  try {
+    const fe = window.frameElement;
+    if (fe){ fe.style.height = h + 'px'; fe.setAttribute('height', h); }
+  } catch(e){}
+  window.parent.postMessage({type:'streamlit:setFrameHeight', height:h}, '*');
+}
+new ResizeObserver(reportHeight).observe(document.body);
+window.addEventListener('load', reportHeight);
+reportHeight();
+</script>
+</body>
+</html>
