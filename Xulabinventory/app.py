@@ -4,8 +4,12 @@ st.set_page_config(page_title="Xulab Inventory", layout="wide")
 
 st.markdown("""
 <style>
+:root, .stApp, [data-testid="stAppViewContainer"], [data-testid="stMain"],
+[data-testid="stHeader"], [data-testid="stSidebarContent"] {
+  background: #EEF1EA !important;
+}
 .block-container {padding: 0 !important; max-width: 100% !important;}
-iframe {display: block; width: 100%;}
+iframe {display: block; width: 100%; background: #EEF1EA;}
 </style>
 """, unsafe_allow_html=True)
 
