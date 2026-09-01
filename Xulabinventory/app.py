@@ -11,6 +11,7 @@ iframe {display: block; width: 100%;}
 
 pages = {
     "Xulab Inventory": [
+        st.Page("app_pages/home.py", title="Home", icon="🏠", default=True),
         st.Page("app_pages/chemical_inventory.py", title="Chemical Inventory", icon="🧪"),
         st.Page("app_pages/cell_inventory.py", title="Cell Inventory", icon="🧫"),
     ]

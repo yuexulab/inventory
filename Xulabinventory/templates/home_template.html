@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xulab Inventory — Home</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EEF1EA;
+    --raised:#F8FAF5;
+    --ink:#1C2620;
+    --soft:#4B5850;
+    --line:#C9D0C2;
+    --amber:#B4661F;
+    --teal:#3F6E63;
+    --teal-soft:#DEE9E4;
+  }
+  *{box-sizing:border-box;}
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Source Serif 4', Georgia, serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  header{
+    padding:38px 32px 24px; border-bottom:1px solid var(--line);
+  }
+  header h1{ margin:0; font-size:29px; font-weight:600; letter-spacing:-0.012em; }
+  header p{ margin:7px 0 0; color:var(--soft); font-size:14.5px; max-width:62ch; line-height:1.55; }
+
+  main{ padding:28px 32px 64px; display:grid; gap:26px; max-width:900px; }
+
+  .section-label{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.09em;
+    text-transform:uppercase; color:var(--soft); margin:0 0 12px;
+  }
+
+  .links{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; }
+  .link-card{
+    display:block; text-decoration:none; color:inherit;
+    background:var(--raised); border:1px solid var(--line); border-radius:4px;
+    padding:15px 16px; transition:border-color .12s ease;
+  }
+  .link-card:hover{ border-color:var(--teal); }
+  .link-card .lk-title{ font-size:14.5px; font-weight:600; margin-bottom:5px; }
+  .link-card .lk-title .arrow{ color:var(--amber); }
+  .link-card .lk-url{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--soft);
+    word-break:break-all; line-height:1.45;
+  }
+
+  .panel{
+    background:var(--raised); border:1px solid var(--line); border-radius:4px;
+    padding:20px 22px;
+  }
+  .panel h2{ margin:0 0 10px; font-size:17px; font-weight:600; }
+  .panel p{ margin:0 0 12px; font-size:13.5px; line-height:1.6; color:var(--ink); }
+  .panel ol{ margin:0 0 12px; padding-left:20px; }
+  .panel li{ font-size:13.5px; line-height:1.65; margin-bottom:5px; }
+  .panel a{ color:var(--teal); text-decoration:none; border-bottom:1px solid var(--teal); }
+  .panel a:hover{ color:var(--amber); border-color:var(--amber); }
+  .cols{
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--soft);
+    background:var(--teal-soft); border-radius:3px; padding:9px 11px; line-height:1.6;
+  }
+  .note{
+    margin-top:12px; font-size:12.5px; color:var(--amber);
+    font-family:'Source Serif 4',serif; line-height:1.55;
+  }
+
+  @media (max-width:640px){
+    header,main{ padding-left:18px; padding-right:18px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Xulab Inventory</h1>
+  <p>Live view of the lab's chemical building blocks and ATCC cell lines. The data is read straight from shared Google Sheets, so anyone in the lab can keep it current without touching code — edits show up here within about a minute, or immediately on reload.</p>
+</header>
+
+<main>
+
+  <section>
+    <p class="section-label">Links</p>
+    <div class="links">
+      <a class="link-card" href="https://yuexu95.github.io/" target="_blank" rel="noopener noreferrer">
+        <div class="lk-title">Lab homepage <span class="arrow">&rarr;</span></div>
+        <div class="lk-url">yuexu95.github.io</div>
+      </a>
+      <a class="link-card" href="https://yuexulab.streamlit.app/" target="_blank" rel="noopener noreferrer">
+        <div class="lk-title">This app <span class="arrow">&rarr;</span></div>
+        <div class="lk-url">yuexulab.streamlit.app</div>
+      </a>
+      <a class="link-card" href="https://docs.google.com/spreadsheets/d/1Vw0FgVxmjveS0k6KJYtrh0G5pVIMIqE_6unkUcSXNIg/edit?gid=1293947143#gid=1293947143" target="_blank" rel="noopener noreferrer">
+        <div class="lk-title">Chemical inventory sheet <span class="arrow">&rarr;</span></div>
+        <div class="lk-url">docs.google.com/&hellip; /1Vw0FgVxmjveS0k6KJYtrh0G5pVIMIqE_6unkUcSXNIg</div>
+      </a>
+      <a class="link-card" href="https://docs.google.com/spreadsheets/d/1Ezga1klNnOzxdRa-8rgWEQhAqDztvxok_qHcyuqu0MY/edit?gid=1147413839#gid=1147413839" target="_blank" rel="noopener noreferrer">
+        <div class="lk-title">Cell line sheet <span class="arrow">&rarr;</span></div>
+        <div class="lk-url">docs.google.com/&hellip; /1Ezga1klNnOzxdRa-8rgWEQhAqDztvxok_qHcyuqu0MY</div>
+      </a>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Updating the inventory</h2>
+    <p>All records live in Google Sheets. To add, remove, or correct an entry:</p>
+    <ol>
+      <li>Open the relevant sheet:
+        <a href="https://docs.google.com/spreadsheets/d/1Vw0FgVxmjveS0k6KJYtrh0G5pVIMIqE_6unkUcSXNIg/edit?gid=1293947143#gid=1293947143" target="_blank" rel="noopener noreferrer">Chemical</a>
+        &nbsp;/&nbsp;
+        <a href="https://docs.google.com/spreadsheets/d/1Ezga1klNnOzxdRa-8rgWEQhAqDztvxok_qHcyuqu0MY/edit?gid=1147413839#gid=1147413839" target="_blank" rel="noopener noreferrer">Cells</a>.
+      </li>
+      <li>Edit rows directly. Keep the header row intact and one record per row.</li>
+      <li>Return here and reload &mdash; the app re-reads the sheets every 60&nbsp;seconds.</li>
+    </ol>
+    <p class="section-label">Columns the app reads</p>
+    <div class="cols">
+      <strong>Chemical:</strong> name &middot; cas &middot; qty &middot; vendor &middot; position &middot; cat &middot; box &middot; smiles<br>
+      <strong>Cells:</strong> cell line &middot; atcc cat. no. &middot; organism / background &middot; tissue / disease &middot; key feature or marker &middot; recommended base medium &middot; role in project &middot; qty &middot; unit price &middot; line total
+    </div>
+    <p class="note">Other columns are ignored, so extra notes are fine. Blank SMILES cells are auto-filled from the CAS number where possible &mdash; worth double-checking those structures.</p>
+  </section>
+
+</main>
+
+<script>
+function reportHeight(){
+  const h = document.documentElement.scrollHeight;
+  try {
+    const fe = window.frameElement;
+    if (fe){ fe.style.height = h + 'px'; fe.setAttribute('height', h); }
+  } catch(e){}
+  window.parent.postMessage({type:'streamlit:setFrameHeight', height:h}, '*');
+}
+new ResizeObserver(reportHeight).observe(document.body);
+window.addEventListener('load', reportHeight);
+reportHeight();
+</script>
+</body>
+</html>
