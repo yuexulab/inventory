@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Xulab Inventory — Home</title>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#EEF1EA;
@@ -16,125 +16,227 @@
     --teal:#3F6E63;
     --teal-soft:#DEE9E4;
   }
-  *{box-sizing:border-box;}
+  *{ box-sizing:border-box; }
   html{ scroll-behavior:smooth; }
   body{
     margin:0; background:var(--paper); color:var(--ink);
     font-family:'Source Serif 4', Georgia, serif;
     -webkit-font-smoothing:antialiased;
   }
+  a{ color:inherit; }
 
-  header{
-    padding:38px 32px 24px; border-bottom:1px solid var(--line);
-  }
-  header h1{ margin:0; font-size:29px; font-weight:600; letter-spacing:-0.012em; }
-  header p{ margin:7px 0 0; color:var(--soft); font-size:14.5px; max-width:62ch; line-height:1.55; }
+  .wrap{ max-width:820px; margin:0 auto; padding:56px 32px 40px; }
 
-  main{ padding:28px 32px 64px; display:grid; gap:26px; max-width:900px; }
-
-  .section-label{
-    font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.09em;
-    text-transform:uppercase; color:var(--soft); margin:0 0 12px;
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:500;
+    letter-spacing:.18em; text-transform:uppercase; color:var(--soft);
+    margin:0 0 18px;
   }
 
-  .links{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; }
-  .link-card{
-    display:block; text-decoration:none; color:inherit;
-    background:var(--raised); border:1px solid var(--line); border-radius:4px;
-    padding:15px 16px; transition:border-color .12s ease;
+  h1{
+    margin:0; font-weight:700; letter-spacing:-0.02em; line-height:1.06;
+    font-size:clamp(30px, 6vw, 44px);
   }
-  .link-card:hover{ border-color:var(--teal); }
-  .link-card .lk-title{ font-size:14.5px; font-weight:600; margin-bottom:5px; }
-  .link-card .lk-title .arrow{ color:var(--amber); }
-  .link-card .lk-url{
-    font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--soft);
-    word-break:break-all; line-height:1.45;
+  .lede{
+    margin:16px 0 0; color:var(--soft); font-size:16px; line-height:1.6;
+    max-width:52ch;
   }
 
-  .panel{
-    background:var(--raised); border:1px solid var(--line); border-radius:4px;
-    padding:20px 22px;
+  .rule{ height:1px; background:var(--line); margin:40px 0 0; }
+
+  /* --- the index: the two inventories as ledger entries --- */
+  .index{ margin-top:4px; }
+  .entry{
+    position:relative; display:grid; width:100%; text-align:left;
+    grid-template-columns:64px 1fr auto; gap:0 22px; align-items:start;
+    padding:30px 8px 30px 0; border:0; border-bottom:1px solid var(--line);
+    background:none; cursor:pointer; color:inherit; font:inherit;
+    transition:padding-left .16s ease;
   }
-  .panel h2{ margin:0 0 10px; font-size:17px; font-weight:600; }
-  .panel p{ margin:0 0 12px; font-size:13.5px; line-height:1.6; color:var(--ink); }
-  .panel ol{ margin:0 0 12px; padding-left:20px; }
-  .panel li{ font-size:13.5px; line-height:1.65; margin-bottom:5px; }
-  .panel a{ color:var(--teal); text-decoration:none; border-bottom:1px solid var(--teal); }
-  .panel a:hover{ color:var(--amber); border-color:var(--amber); }
+  .entry::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:2px;
+    background:var(--amber); transform:scaleY(0); transform-origin:top;
+    transition:transform .16s ease;
+  }
+  .entry:hover, .entry:focus-visible{ padding-left:16px; outline:none; }
+  .entry:hover::before, .entry:focus-visible::before{ transform:scaleY(1); }
+  .entry:focus-visible{ box-shadow:none; }
+
+  .entry .tag{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600;
+    letter-spacing:.1em; color:var(--soft); padding-top:6px;
+    transition:color .16s ease;
+  }
+  .entry:hover .tag, .entry:focus-visible .tag{ color:var(--teal); }
+
+  .entry .name{
+    font-size:24px; font-weight:600; letter-spacing:-0.01em; line-height:1.2;
+    display:flex; align-items:baseline; gap:10px;
+  }
+  .entry .name .go{
+    font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:500;
+    color:var(--soft); opacity:0; transform:translateX(-4px);
+    transition:opacity .16s ease, transform .16s ease, color .16s ease;
+  }
+  .entry:hover .name .go, .entry:focus-visible .name .go{
+    opacity:1; transform:translateX(0); color:var(--amber);
+  }
+  .entry .desc{
+    margin-top:6px; color:var(--soft); font-size:14px; line-height:1.5;
+    max-width:40ch;
+  }
+
+  .entry .count{ text-align:right; padding-top:2px; white-space:nowrap; }
+  .entry .count .n{
+    font-family:'IBM Plex Mono',monospace; font-size:30px; font-weight:600;
+    line-height:1; color:var(--ink); transition:color .16s ease;
+  }
+  .entry:hover .count .n, .entry:focus-visible .count .n{ color:var(--teal); }
+  .entry .count .u{
+    display:block; margin-top:6px;
+    font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--soft);
+  }
+  .entry .count.empty .n{ font-size:15px; color:var(--soft); }
+
+  /* --- keeping it current --- */
+  .maintain{ margin-top:44px; }
+  .maintain p{
+    margin:12px 0 0; font-size:15px; line-height:1.62; max-width:54ch;
+  }
+  .sheet-links{
+    margin-top:16px; display:flex; flex-wrap:wrap; gap:10px 22px;
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px;
+  }
+  .sheet-links a{
+    color:var(--teal); text-decoration:none;
+    border-bottom:1px solid var(--teal); padding-bottom:1px;
+  }
+  .sheet-links a:hover{ color:var(--amber); border-color:var(--amber); }
   .cols{
+    margin-top:18px;
     font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--soft);
-    background:var(--teal-soft); border-radius:3px; padding:9px 11px; line-height:1.6;
+    background:var(--teal-soft); border-radius:3px; padding:11px 13px; line-height:1.7;
   }
-  .note{
-    margin-top:12px; font-size:12.5px; color:var(--amber);
-    font-family:'Source Serif 4',serif; line-height:1.55;
+  .cols b{ color:var(--ink); font-weight:600; }
+  .caveat{
+    margin-top:12px; font-size:12.5px; color:var(--amber); line-height:1.55;
+    max-width:54ch;
   }
 
-  @media (max-width:640px){
-    header,main{ padding-left:18px; padding-right:18px; }
+  /* --- footer --- */
+  .foot{
+    margin-top:48px; padding-top:18px; border-top:1px solid var(--line);
+    display:flex; flex-wrap:wrap; gap:6px 28px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px;
+    letter-spacing:.03em; color:var(--soft);
+  }
+  .foot a{ color:var(--soft); text-decoration:none; }
+  .foot a:hover{ color:var(--teal); }
+  .foot .k{ color:var(--ink); }
+
+  @keyframes rise{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+  .anim{ opacity:0; animation:rise .5s cubic-bezier(.2,.7,.2,1) forwards; }
+  .anim.d1{ animation-delay:.06s; }
+  .anim.d2{ animation-delay:.13s; }
+  .anim.d3{ animation-delay:.2s; }
+  .anim.d4{ animation-delay:.27s; }
+
+  @media (max-width:560px){
+    .wrap{ padding:40px 20px 32px; }
+    .entry{ grid-template-columns:1fr; gap:4px; padding:24px 4px; }
+    .entry .tag{ padding-top:0; }
+    .entry .count{ text-align:left; margin-top:10px; }
+    .entry .count .n{ font-size:22px; }
+    .entry:hover, .entry:focus-visible{ padding-left:12px; }
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{ scroll-behavior:auto; }
+    .anim{ opacity:1; animation:none; }
+    .entry, .entry::before, .entry .tag, .entry .name .go, .entry .count .n{ transition:none; }
   }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Xulab Inventory</h1>
-  <p>Live view of the lab's chemical building blocks and ATCC cell lines. The data is read straight from shared Google Sheets, so anyone in the lab can keep it current without touching code — edits show up here within about a minute, or immediately on reload.</p>
-</header>
+<div class="wrap">
 
-<main>
+  <p class="eyebrow anim">Xu Lab · Inventory</p>
+  <h1 class="anim d1">Building blocks &amp; cell lines,<br>one working list.</h1>
+  <p class="lede anim d1">Reagent and cell-line stock for the LNP delivery programs, read live from the lab's shared Google Sheets. Nothing to install &mdash; open a sheet, edit a row, and it shows up here.</p>
 
-  <section>
-    <p class="section-label">Links</p>
-    <div class="links">
-      <a class="link-card" href="https://yuexu95.github.io/" target="_blank" rel="noopener noreferrer">
-        <div class="lk-title">Lab homepage <span class="arrow">&rarr;</span></div>
-        <div class="lk-url">yuexu95.github.io</div>
-      </a>
-      <a class="link-card" href="https://yuexulab.streamlit.app/" target="_blank" rel="noopener noreferrer">
-        <div class="lk-title">This app <span class="arrow">&rarr;</span></div>
-        <div class="lk-url">yuexulab.streamlit.app</div>
-      </a>
-      <a class="link-card" href="https://docs.google.com/spreadsheets/d/1Vw0FgVxmjveS0k6KJYtrh0G5pVIMIqE_6unkUcSXNIg/edit?gid=1293947143#gid=1293947143" target="_blank" rel="noopener noreferrer">
-        <div class="lk-title">Chemical inventory sheet <span class="arrow">&rarr;</span></div>
-        <div class="lk-url">docs.google.com/&hellip; /1Vw0FgVxmjveS0k6KJYtrh0G5pVIMIqE_6unkUcSXNIg</div>
-      </a>
-      <a class="link-card" href="https://docs.google.com/spreadsheets/d/1Ezga1klNnOzxdRa-8rgWEQhAqDztvxok_qHcyuqu0MY/edit?gid=1147413839#gid=1147413839" target="_blank" rel="noopener noreferrer">
-        <div class="lk-title">Cell line sheet <span class="arrow">&rarr;</span></div>
-        <div class="lk-url">docs.google.com/&hellip; /1Ezga1klNnOzxdRa-8rgWEQhAqDztvxok_qHcyuqu0MY</div>
-      </a>
+  <div class="rule anim d2"></div>
+
+  <div class="index">
+
+    <button class="entry anim d2" onclick="goto('chemical_inventory')">
+      <span class="tag">CHEM</span>
+      <span>
+        <span class="name">Chemical Inventory <span class="go">open &rarr;</span></span>
+        <span class="desc">Reagent stock for ionizable-lipid synthesis, boxed by scale. Structures drawn from SMILES.</span>
+      </span>
+      <span class="count {{CHEM_COUNT_CLASS}}">
+        <span class="n">{{CHEM_COUNT}}</span>
+        <span class="u">{{CHEM_COUNT_UNIT}}</span>
+      </span>
+    </button>
+
+    <button class="entry anim d3" onclick="goto('cell_inventory')">
+      <span class="tag">CELL</span>
+      <span>
+        <span class="name">Cell Inventory <span class="go">open &rarr;</span></span>
+        <span class="desc">ATCC lines ordered for the delivery programs, grouped by project.</span>
+      </span>
+      <span class="count {{CELL_COUNT_CLASS}}">
+        <span class="n">{{CELL_COUNT}}</span>
+        <span class="u">{{CELL_COUNT_UNIT}}</span>
+      </span>
+    </button>
+
+  </div>
+
+  <div class="maintain anim d4">
+    <p class="eyebrow" style="margin-bottom:0;">Keeping it current</p>
+    <p>Every record lives in a Google Sheet. Edit a row directly &mdash; keep the header row intact, one entry per row &mdash; and reload this app; it re-reads the sheets about once a minute.</p>
+    <div class="sheet-links">
+      <a href="https://docs.google.com/spreadsheets/d/1Vw0FgVxmjveS0k6KJYtrh0G5pVIMIqE_6unkUcSXNIg/edit?gid=1293947143#gid=1293947143" target="_blank" rel="noopener noreferrer">Chemical sheet &#8599;</a>
+      <a href="https://docs.google.com/spreadsheets/d/1Ezga1klNnOzxdRa-8rgWEQhAqDztvxok_qHcyuqu0MY/edit?gid=1147413839#gid=1147413839" target="_blank" rel="noopener noreferrer">Cell sheet &#8599;</a>
     </div>
-  </section>
-
-  <section class="panel">
-    <h2>Updating the inventory</h2>
-    <p>All records live in Google Sheets. To add, remove, or correct an entry:</p>
-    <ol>
-      <li>Open the relevant sheet:
-        <a href="https://docs.google.com/spreadsheets/d/1Vw0FgVxmjveS0k6KJYtrh0G5pVIMIqE_6unkUcSXNIg/edit?gid=1293947143#gid=1293947143" target="_blank" rel="noopener noreferrer">Chemical</a>
-        &nbsp;/&nbsp;
-        <a href="https://docs.google.com/spreadsheets/d/1Ezga1klNnOzxdRa-8rgWEQhAqDztvxok_qHcyuqu0MY/edit?gid=1147413839#gid=1147413839" target="_blank" rel="noopener noreferrer">Cells</a>.
-      </li>
-      <li>Edit rows directly. Keep the header row intact and one record per row.</li>
-      <li>Return here and reload &mdash; the app re-reads the sheets every 60&nbsp;seconds.</li>
-    </ol>
-    <p class="section-label">Columns the app reads</p>
     <div class="cols">
-      <strong>Chemical:</strong> name &middot; cas &middot; qty &middot; vendor &middot; position &middot; cat &middot; box &middot; smiles<br>
-      <strong>Cells:</strong> cell line &middot; atcc cat. no. &middot; organism / background &middot; tissue / disease &middot; key feature or marker &middot; recommended base medium &middot; role in project &middot; qty &middot; unit price &middot; line total
+      <b>Chemical reads</b> &nbsp;name · cas · qty · vendor · position · cat · box · smiles<br>
+      <b>Cells read</b> &nbsp;cell line · atcc cat. no. · organism / background · tissue / disease · key feature or marker · recommended base medium · role in project · qty · unit price · line total
     </div>
-    <p class="note">Other columns are ignored, so extra notes are fine. Blank SMILES cells are auto-filled from the CAS number where possible &mdash; worth double-checking those structures.</p>
-  </section>
+    <p class="caveat">Extra columns are ignored, so side notes are safe. Blank SMILES cells get filled from the CAS number where possible &mdash; give those structures a second look.</p>
+  </div>
 
-</main>
+  <div class="foot anim d4">
+    <span><span class="k">Lab site</span> &nbsp;<a href="https://yuexu95.github.io/" target="_blank" rel="noopener noreferrer">yuexu95.github.io &#8599;</a></span>
+    <span><span class="k">App</span> &nbsp;<a href="https://yuexulab.streamlit.app/" target="_blank" rel="noopener noreferrer">yuexulab.streamlit.app &#8599;</a></span>
+  </div>
+
+</div>
 
 <script>
+// Internal page switches: the component iframe has no allow-top-navigation,
+// so click Streamlit's real sidebar nav link in the parent (same-origin srcdoc).
+// Fall back to opening the page in a new tab if that link can't be found.
+function goto(slug){
+  try{
+    const doc = window.parent.document;
+    const link = doc.querySelector('a[data-testid="stSidebarNavLink"][href$="/'+slug+'"]')
+              || doc.querySelector('[data-testid="stSidebarNav"] a[href$="/'+slug+'"]')
+              || doc.querySelector('a[href$="/'+slug+'"]');
+    if(link){ link.click(); return; }
+  }catch(e){}
+  window.open('/'+slug, '_blank', 'noopener');
+}
+
 function reportHeight(){
   const h = document.documentElement.scrollHeight;
-  try {
+  try{
     const fe = window.frameElement;
-    if (fe){ fe.style.height = h + 'px'; fe.setAttribute('height', h); }
-  } catch(e){}
+    if(fe){ fe.style.height = h + 'px'; fe.setAttribute('height', h); }
+  }catch(e){}
   window.parent.postMessage({type:'streamlit:setFrameHeight', height:h}, '*');
 }
 new ResizeObserver(reportHeight).observe(document.body);
