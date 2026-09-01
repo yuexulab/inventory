@@ -101,13 +101,14 @@
   }
 
   .overlay{
-    position:fixed; inset:0; background:rgba(20,26,22,.55);
-    display:none; align-items:center; justify-content:center; z-index:50; padding:24px;
+    position:absolute; inset:0; background:rgba(20,26,22,.55);
+    display:none; z-index:50;
   }
-  .overlay.on{ display:flex; }
+  .overlay.on{ display:block; }
   .modal{
+    position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
     background:var(--raised); border:1px solid var(--line); border-radius:6px;
-    max-width:560px; width:100%; max-height:88vh; overflow-y:auto;
+    max-width:560px; width:calc(100% - 48px); max-height:88vh; overflow-y:auto;
   }
   .mhead{ display:flex; justify-content:space-between; align-items:flex-start; padding:19px 22px 0; }
   .mclose{ background:none; border:none; font-size:22px; color:var(--soft); cursor:pointer; line-height:1; padding:0 4px; }
@@ -280,12 +281,36 @@ function open(d){
   modal.appendChild(det);
 
   overlay.classList.add('on');
+  placeModal();
   x.focus();
+}
+
+// The component iframe is stretched to its full content height (see reportHeight),
+// so position:fixed resolves against the top of the whole card list, not the part
+// of the page in view. Center the modal in the band that is actually visible.
+function placeModal(){
+  let vh, top;
+  try{
+    const fe = window.frameElement;
+    const r = fe.getBoundingClientRect();
+    const visTop = Math.max(0, -r.top);
+    const visBottom = Math.min(fe.clientHeight, window.parent.innerHeight - r.top);
+    vh = Math.max(160, visBottom - visTop);
+    top = window.scrollY + visTop + vh/2;
+  }catch(e){
+    vh = window.innerHeight;
+    top = window.scrollY + vh/2;
+  }
+  modal.style.top = top + 'px';
+  modal.style.maxHeight = (vh - 48) + 'px';
 }
 
 function close(){ overlay.classList.remove('on'); }
 overlay.onclick=e=>{ if(e.target===overlay) close(); };
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') close(); });
+['scroll','resize'].forEach(ev=>{
+  try{ window.parent.addEventListener(ev,()=>{ if(overlay.classList.contains('on')) placeModal(); },{passive:true}); }catch(e){}
+});
 
 render();
 
