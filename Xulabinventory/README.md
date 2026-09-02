@@ -30,4 +30,4 @@ pip install -r requirements.txt
 python app.py
 
 ```
-https://cmhxulab.streamlit.app/
+https://yuexulab.streamlit.app/
