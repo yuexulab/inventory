@@ -12,8 +12,8 @@ A web-based application built with Flask for tracking and managing laboratory ch
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/CMRIXULAB/Chemical-Inventory.git
-cd Chemical-Inventory
+git clone https://github.com/yuexulab/inventory.git
+cd Inventory
 
 ```
 
